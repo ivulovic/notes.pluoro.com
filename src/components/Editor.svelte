@@ -1,0 +1,71 @@
+<script>
+  import { quill } from "svelte-quill";
+  import { onMount, createEventDispatcher, afterUpdate, onDestroy } from "svelte";
+  const dispatch = createEventDispatcher();
+  export let intialEditorContent;
+
+  $: if(intialEditorContent.html){
+    initiateEditor();
+  }
+
+  function initiateEditor(){
+    const qlEditorContentRef = document.querySelector(".ql-editor");
+    if(qlEditorContentRef){
+      qlEditorContentRef.innerHTML= intialEditorContent.html;
+    }
+  }
+
+  let options = {
+    modules: {
+      toolbar: [
+        [{ header: [1, 2, 3, 4, 5, false] }],
+        [{ size: [] }],
+        [{ font: [] }],
+        [{ color: [] }],
+        [{ background: [] }],
+        [
+          { align: "" },
+          { align: "center" },
+          { align: "right" },
+          { align: "justify" },
+          { list: "ordered" },
+          { list: "bullet" },
+          { indent: "+1" },
+          { indent: "-1" },
+        ],
+        ["bold", "italic", "underline", "strike", "blockquote"],
+        ["code-block", "link", "image", "video"],
+      ],
+    },
+    placeholder: "Note content...",
+  };
+</script>
+
+
+<svelte:head>
+  <link rel="stylesheet" href="//cdn.quilljs.com/1.3.6/quill.snow.css">
+</svelte:head>
+<style>
+  :global(.editor) {
+    color: var(--text);
+    min-height: 250px;
+    border-color: transparent !important;
+  }
+  :global(.ql-container.ql-snow) {
+    border:none!important;
+    outline: none!important;
+  }
+
+  :global(main .ql-toolbar.ql-snow),
+  :global(.ql-blank::before) {
+    border-color: transparent;
+    color: var(--neutral) !important;
+  }
+  :global(.ql-container) {
+    height: unset !important;
+  }
+</style>
+
+<main>
+  <div class="editor" use:quill={options} on:text-change></div>
+</main>
