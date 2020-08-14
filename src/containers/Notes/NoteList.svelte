@@ -7,6 +7,10 @@
     makePostReq,
   } from "../../utils/request";
   import { timeSince } from "../../utils/date";
+  import RemoveirectoryIcon from "../../components/icons/RemoveDirectoryIcon.svelte";
+  import CreateDirectoryIcon from "../../components/icons/CreateDirectoryIcon.svelte";
+  import CreateNoteIcon from "../../components/icons/CreateNoteIcon.svelte";
+import UpdateDirectoryIcon from "../../components/icons/UpdateDirectoryIcon.svelte";
   export let params = {};
 
   const dispatch = createEventDispatcher();
@@ -22,6 +26,9 @@
     e.preventDefault();
     e.stopPropagation();
     dispatch("noteRemove", { noteId: e.target.value });
+  };
+  const onDirectoryRemove = () => { 
+    dispatch("directoryRemove", { directoryId });
   };
 </script>
 
@@ -45,12 +52,12 @@
     font-weight: 500;
     font-size: 20px;
     letter-spacing: 0.03rem;
-    padding: 30px 20px 30px 0px;
+    padding: 15px 5px 15px 0px;
   }
   .header select option {
     padding: 10px;
     font-size: 16px;
-    color: var(--background);
+    color: black;
   }
   .note-list {
     display: grid;
@@ -64,7 +71,7 @@
   }
   .note-list a {
     display: block;
-    padding: 15px 10px;
+    padding: 10px;
     text-decoration: none;
   }
   .note-list .note-title {
@@ -86,12 +93,24 @@
     outline: none;
     cursor: pointer;
     background: transparent;
-    z-index: 1;
-
+    z-index: 1; 
     position: absolute;
     right: 0;
+    bottom: -5px;
     z-index: 2;
     padding: 5px;
+    padding-right: 0;
+  }
+  .neutral-hover > *{
+    color: var(--neutral);
+    transition: color 0.3s ease;
+  }
+  .neutral-hover > *:hover{
+    color: var(--text);
+  }
+  .header-control{ 
+    position: static;
+    padding: 0px;
   }
   button:hover {
     color: var(--text);
@@ -99,37 +118,41 @@
   .relative {
     position: relative;
   }
-  .tip {
-    background-color: var(--tip-color);
-  }
 </style>
 
 <main>
   <div class="header">
+    {#if directoryId}
+    <span class="neutral-hover">
+      <a href={"/notes"} title="Create Directory">
+        <CreateDirectoryIcon/>
+      </a>
+      <a href={"/notes/"+directoryId+"/update"} title="Update Directory">
+        <UpdateDirectoryIcon/>
+      </a>
+      <button on:click={onDirectoryRemove} class="header-control" title="Remove Directory">
+        <RemoveirectoryIcon/>
+      </button> 
+    </span>
+    {/if} 
     <select bind:value={directoryId} on:input={onDirectoryChange}>
-      <option value="">Choose directory</option>
+      <option value="">Choose Directory</option>
       {#each directories as directory}
         <option value={directory._id}>{directory.name}</option>
       {/each}
-    </select>
+    </select> 
     {#if directoryId}
-      <div>
-        <!-- <small>Update</small>
-        <small>Remove</small> -->
+      <div class="neutral-hover"> 
+        <a href={'/notes/' + directoryId} title="Create Note">
+          <CreateNoteIcon/>
+        </a>
       </div>
+    {/if}
+    {#if !directoryId}
+      <span/>
     {/if}
   </div>
   <ul class="note-list">
-    {#if directoryId}
-      <li>
-        <a class="tip" href={'/notes/' + directoryId}>
-          <p class="note-title">Create Note</p>
-          <div class="note-description">
-            <p>Click here to create new one.</p>
-          </div>
-        </a>
-      </li>
-    {/if}
     {#if notes}
       {#each notes as note}
         <li>
@@ -156,14 +179,6 @@
       </li>
     {/if}
     {#if !directoryId}
-      <li>
-        <a class="tip" href=" #">
-          <p class="note-title">Create Directory</p>
-          <div class="note-description">
-            <p>Creeate directory using the form on the right.</p>
-          </div>
-        </a>
-      </li>
       <li>
         <a href=" #">
           <p class="note-title">Choose directory to view notes</p>

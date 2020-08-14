@@ -41,10 +41,6 @@
   };
 </script>
 
-
-<svelte:head>
-  <link rel="stylesheet" href="//cdn.quilljs.com/1.3.6/quill.snow.css">
-</svelte:head>
 <style>
   :global(.editor) {
     color: var(--text);
@@ -54,12 +50,16 @@
   :global(.ql-container.ql-snow) {
     border:none!important;
     outline: none!important;
+    font-size: unset;
   }
 
   :global(main .ql-toolbar.ql-snow),
   :global(.ql-blank::before) {
     border-color: transparent;
     color: var(--neutral) !important;
+  }
+  :global(.ql-toolbar){
+    background: var(--sidebar-after-background);
   }
   :global(.ql-container) {
     height: unset !important;

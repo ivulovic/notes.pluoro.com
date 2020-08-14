@@ -1,5 +1,7 @@
 <script>
   import Logo from "./Logo.svelte";
+  import BlogIcon from "./icons/BlogIcon.svelte";
+  import NoteIcon from "./icons/NoteIcon.svelte";
   function checkIsActive(path) {
     return window.location.pathname.includes(path) ? "active" : "";
   }
@@ -7,7 +9,6 @@
 
 <style>
   aside {
-    width: 250px;
     height: 100%;
     display: flex;
     padding: 10px 5px;
@@ -16,6 +17,7 @@
     flex-direction: column;
     background-color: var(--sidebar-background);
     justify-content: space-between;
+    width: 70px;
   }
   nav,
   footer {
@@ -34,9 +36,10 @@
     text-decoration: none;
     color: var(--neutral);
     font-weight: 500;
-    padding: 15px;
+    padding: 10px 0px;
     letter-spacing: 0.03rem;
     border-radius: 25px;
+    transition: color 0.3s ease;
   }
   nav a:hover {
     color: var(--text);
@@ -52,10 +55,14 @@
   <nav>
     <ul>
       <li>
-        <a href="/blog" class={checkIsActive('/blog')} tinro-ignore>Blog</a>
+        <a href="/blog" class={checkIsActive('/blog')} tinro-ignore>
+          <BlogIcon />
+        </a>
       </li>
       <li>
-        <a href="/notes" class={checkIsActive('/notes')} tinro-ignore>Notes</a>
+        <a href="/notes" class={checkIsActive('/notes')} tinro-ignore>
+          <NoteIcon />
+        </a>
       </li>
     </ul>
   </nav>

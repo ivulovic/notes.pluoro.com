@@ -10,7 +10,7 @@
   .logo img {
     width: 60px;
   }
-  .logo-text-primary {
+  /* .logo-text-primary {
     text-decoration: none;
     text-transform: uppercase;
     font-weight: 500;
@@ -28,13 +28,13 @@
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.03rem;
-  }
+  } */
 </style>
 
 <a href="/" tinro-ignore class="logo">
   <img src="/static/logo.png" alt="logo" />
-  <div>
+  <!-- <div>
     <div class="logo-text-primary">Pluoro</div>
     <div class="logo-text-secondary">Imagine unimaginable</div>
-  </div>
+  </div> -->
 </a>

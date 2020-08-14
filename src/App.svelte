@@ -68,7 +68,6 @@
     --link: #1a73e8;
     --sidebar-background: #fafafa;
     --sidebar-after-background: #ececec94;
-    --tip-color: #fff5a6d1;
   }
   :global(.theme-dark) {
     --primary: #d21e2b;
@@ -79,10 +78,12 @@
     --link: #1a73e8;
     --sidebar-background: #131313;
     --sidebar-after-background: #21212194;
-    --tip-color: #211627b8;
   }
 </style>
 
+<svelte:head>
+  <link rel="stylesheet" href="//cdn.quilljs.com/1.3.6/quill.snow.css">
+</svelte:head>
 <div id="root" class="theme-{theme}">
   <div class="sidebar-layout">
     <!-- <Header on:themeChange={onThemeChange} /> -->
@@ -93,6 +94,9 @@
         <Notes {params} />
       </Route>
       <Route path="/notes/:directoryId" let:params>
+        <Notes {params}/>
+      </Route>
+      <Route path="/notes/:directoryId/edit" let:params>
         <Notes {params}/>
       </Route>
       <Route path="/notes/:directoryId/:noteId" let:params>

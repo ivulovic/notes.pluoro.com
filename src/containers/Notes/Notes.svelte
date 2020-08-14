@@ -1,7 +1,7 @@
 <script>
   import Editor from "../../components/Editor.svelte";
   import { onMount } from "svelte";
-  import { router } from "tinro";
+  import { router, Route } from "tinro";
 
   import request, {
     makeApiUrl,
@@ -32,6 +32,7 @@ makeDeleteReq,
 
   let notes = [];
 
+
   onMount(async () => {
     const response = await request(
       makeApiUrl("/notes/directories"),
@@ -49,11 +50,11 @@ makeDeleteReq,
     if (directoryId) {
       try{
         const response = await request(
-        makeApiUrl("/notes/notes/" + directoryId),
-        makeGetReq()
-      );
-      notes = response;
-      router.goto("/notes" + (directoryId ? "/" + directoryId : "") + (noteId ? "/" + noteId : ""));
+          makeApiUrl("/notes/notes/" + directoryId),
+          makeGetReq()
+        );
+        notes = response;
+        router.goto("/notes" + (directoryId ? "/" + directoryId : "") + (noteId ? "/" + noteId : ""));
       } catch(error){
         router.goto("/notes" + (directoryId ? "/" + directoryId : ""));
       }
@@ -62,7 +63,7 @@ makeDeleteReq,
     }
   };
   const loadNoteInfo = async ({ detail: { directoryId, noteId } }) => {
-    if (directoryId) {
+    if (directoryId && noteId!=="update") {
       const response = await request(
         makeApiUrl("/notes/notes/" + noteId+"/info"),
         makeGetReq()
@@ -123,6 +124,20 @@ makeDeleteReq,
       }
     }
   }
+
+  const onUpdateDirectory = async () => {
+    const {directoryId} = params;
+    if(directoryName && directoryName.trim()){
+      try{
+        const response = await request(
+        makeApiUrl("/notes/directories/"+directoryId),
+        makePatchReq({name: directoryName })
+      );
+      directories = directories.map(x => x._id === response._id ? response : x);
+    } catch(e){
+    }
+    }
+  }
   const onRemoveNote = async({detail:{noteId}}) => {
     if(!noteId) return;
     try{
@@ -137,15 +152,26 @@ makeDeleteReq,
     } catch(e){
     }
   }
+  const onRemoveDirectory = async({detail:{directoryId}}) => {
+    try{
+      const response = await request(
+        makeApiUrl("/notes/directories/"+directoryId),
+        makeDeleteReq()
+      );
+      directories = directories.filter(x => x._id !== response._id);
+      router.goto("/notes");
+    } catch(e){
+    }
+  }
 </script>
 
 <style>
   main {
-    width: 80%;
     display: grid;
-    margin-left: 250px;
+    margin-left: 70px;
     position: relative;
     grid-template-columns: 25% 75%;
+    padding: 0px 0px 0px 0px;
   }
   button {
     color: var(--text);
@@ -153,13 +179,11 @@ makeDeleteReq,
     outline: none;
     cursor: pointer;
     background: transparent;
-  }
-  .controls {
-    padding: 10px 15px;
-  }
+  } 
   .controls button {
     padding: 5px 10px;
     border: 1px solid var(--edge);
+    margin-top: 8px;
   }
   .controls button:hover {
     background-color: var(--edge);
@@ -168,31 +192,51 @@ makeDeleteReq,
     background: transparent;
     border: none;
     outline: none;
-    border-bottom: 1px solid var(--edge);
-    padding: 10px;
     width: 100%;
-    margin: 25px 15px 15px 15px;
     color: var(--text);
+    padding: 28px 20px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    padding-top: 25px 0px 15px 0px;
+  } 
+  .controls {
+    padding: 0px 15px;
   }
 </style>
 
-<main>
-  <NoteList {params} on:noteRemove={onRemoveNote} on:directoryChange={loadNotes} directories={directories} {notes} />
+<main> 
+  
+  <NoteList {params} on:directoryRemove={onRemoveDirectory} on:noteRemove={onRemoveNote} on:directoryChange={loadNotes} directories={directories} {notes} />
   
   {#if params.directoryId}
-    <div>
-      <input
-        bind:value={noteTitle}
-        class="note-title"
-        placeholder="Note title..." />
-      <Editor on:text-change={handleTextChange} {intialEditorContent} />
-      <div class="controls">
-        <button
-          on:click={handleAction}>
-          Save changes
-        </button>
+    {#if params.noteId==="update"}
+      <div>
+        <input
+          class="note-title"
+          bind:value={directoryName}
+          placeholder="New directory name..." />
+          <div class="controls">
+            <button
+              on:click={onUpdateDirectory}>
+              Update Directory
+            </button>
+          </div>
       </div>
-    </div>
+    {:else}
+      <div>
+        <input
+          bind:value={noteTitle}
+          class="note-title"
+          placeholder="Note title..." />
+        <Editor on:text-change={handleTextChange} {intialEditorContent} />
+        <div class="controls">
+          <button
+            on:click={handleAction}>
+            Save changes
+          </button>
+        </div>
+      </div>
+    {/if}
   {:else}
   <div>
     <input
