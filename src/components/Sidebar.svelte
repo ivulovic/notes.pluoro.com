@@ -2,9 +2,15 @@
   import Logo from "./Logo.svelte";
   import BlogIcon from "./icons/BlogIcon.svelte";
   import NoteIcon from "./icons/NoteIcon.svelte";
+  import { createEventDispatcher } from "svelte";
+  import DarkThemeIcon from "./icons/DarkThemeIcon.svelte";
+  import LightThemeIcon from "./icons/LightThemeIcon.svelte";
   function checkIsActive(path) {
     return window.location.pathname.includes(path) ? "active" : "";
   }
+  export let theme;
+  const dispatch = createEventDispatcher();
+  const toggleTheme = () => dispatch("themeChange");
 </script>
 
 <style>
@@ -27,11 +33,13 @@
     display: grid;
     grid-template-columns: 1fr;
   }
-  nav li {
+  nav li,
+  button {
     list-style: none;
     display: inline-block;
   }
-  nav a {
+  nav a,
+  button {
     display: block;
     text-decoration: none;
     color: var(--neutral);
@@ -41,11 +49,28 @@
     border-radius: 25px;
     transition: color 0.3s ease;
   }
-  nav a:hover {
+  button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    margin: 0px;
+    text-align: center;
+
+    width: 100%;
+  }
+  nav a:hover,
+  button:hover {
     color: var(--text);
   }
   nav a.active {
     color: var(--text) !important;
+  }
+  footer {
+    text-align: center;
+    align-items: center;
+    display: flex;
+    justify-content: center;
   }
 </style>
 
@@ -67,5 +92,13 @@
     </ul>
   </nav>
 
-  <footer />
+  <footer>
+    <button on:click={toggleTheme}>
+      {#if theme === 'dark'}
+        <LightThemeIcon />
+      {:else}
+        <DarkThemeIcon />
+      {/if}
+    </button>
+  </footer>
 </aside>

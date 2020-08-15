@@ -7,28 +7,60 @@
     makePostReq,
   } from "../../utils/request";
   import { timeSince } from "../../utils/date";
+  import { loadDirectoryNotes } from "../../actions/note";
   import RemoveirectoryIcon from "../../components/icons/RemoveDirectoryIcon.svelte";
   import CreateDirectoryIcon from "../../components/icons/CreateDirectoryIcon.svelte";
   import CreateNoteIcon from "../../components/icons/CreateNoteIcon.svelte";
-import UpdateDirectoryIcon from "../../components/icons/UpdateDirectoryIcon.svelte";
-  export let params = {};
+  import UpdateDirectoryIcon from "../../components/icons/UpdateDirectoryIcon.svelte";
+  import { note } from "../../actions";
+  import { removeDirectory } from "../../actions/directory";
+  import { removeNote } from "../../actions/note";
+  import { isNotEmpty } from "../../utils/validators";
 
-  const dispatch = createEventDispatcher();
-  let { directoryId } = params;
-
-  export let notes = [];
+  let notes = [];
+  export let params;
   export let directories = [];
+  let { directoryId } = params;
+  const dispatch = createEventDispatcher();
 
-  const onDirectoryChange = (e) => {
-    dispatch("directoryChange", { directoryId: e.target.value });
+  $: if (directoryId) {
+    loadNotes(directoryId);
+  }
+
+  const loadNotes = async (directoryId) => {
+    const res = await loadDirectoryNotes({ directoryId });
+    notes = res.payload;
   };
-  const onNoteRemove = (e) => {
+
+  export const updateNote = (payload) => {
+    notes = notes.map((n) => (n._id === payload._id ? payload : n));
+  };
+  export const addNote = (payload) => {
+    notes = [payload, ...notes];
+  };
+  const onNoteRemove = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch("noteRemove", { noteId: e.target.value });
+    console.log("eee ", e.target.value);
+    // if (window.confirm("Remove note?")) {
+    const res = await removeNote({ noteId: e.target.value });
+    notes = notes.filter((n) => n._id !== e.target.value);
+    if (e.target.value === params.noteId) {
+      router.goto("/notes/directories/" + directoryId);
+    }
+    // }
   };
-  const onDirectoryRemove = () => { 
-    dispatch("directoryRemove", { directoryId });
+  const onDirectoryChange = (e) => {
+    router.goto(
+      "/notes/directories" + (e.target.value ? "/" + e.target.value : "")
+    );
+  };
+
+  const handleRemove = async () => {
+    if (window.confirm("Remove directory?")) {
+      const res = await removeDirectory({ directoryId });
+      dispatch("remove", res);
+    }
   };
 </script>
 
@@ -50,13 +82,13 @@ import UpdateDirectoryIcon from "../../components/icons/UpdateDirectoryIcon.svel
     color: var(--text);
     outline: none;
     font-weight: 500;
-    font-size: 20px;
+    font-size: 16px;
     letter-spacing: 0.03rem;
     padding: 15px 5px 15px 0px;
   }
   .header select option {
     padding: 10px;
-    font-size: 16px;
+    font-size: 14px;
     color: black;
   }
   .note-list {
@@ -93,7 +125,6 @@ import UpdateDirectoryIcon from "../../components/icons/UpdateDirectoryIcon.svel
     outline: none;
     cursor: pointer;
     background: transparent;
-    z-index: 1; 
     position: absolute;
     right: 0;
     bottom: -5px;
@@ -101,14 +132,14 @@ import UpdateDirectoryIcon from "../../components/icons/UpdateDirectoryIcon.svel
     padding: 5px;
     padding-right: 0;
   }
-  .neutral-hover > *{
+  .neutral-hover > * {
     color: var(--neutral);
     transition: color 0.3s ease;
   }
-  .neutral-hover > *:hover{
+  .neutral-hover > *:hover {
     color: var(--text);
   }
-  .header-control{ 
+  .header-control {
     position: static;
     padding: 0px;
   }
@@ -118,50 +149,64 @@ import UpdateDirectoryIcon from "../../components/icons/UpdateDirectoryIcon.svel
   .relative {
     position: relative;
   }
+  .note-control {
+    z-index: 9;
+  }
 </style>
 
 <main>
   <div class="header">
-    {#if directoryId}
-    <span class="neutral-hover">
-      <a href={"/notes"} title="Create Directory">
-        <CreateDirectoryIcon/>
-      </a>
-      <a href={"/notes/"+directoryId+"/update"} title="Update Directory">
-        <UpdateDirectoryIcon/>
-      </a>
-      <button on:click={onDirectoryRemove} class="header-control" title="Remove Directory">
-        <RemoveirectoryIcon/>
-      </button> 
-    </span>
-    {/if} 
     <select bind:value={directoryId} on:input={onDirectoryChange}>
       <option value="">Choose Directory</option>
       {#each directories as directory}
         <option value={directory._id}>{directory.name}</option>
       {/each}
-    </select> 
-    {#if directoryId}
-      <div class="neutral-hover"> 
-        <a href={'/notes/' + directoryId} title="Create Note">
-          <CreateNoteIcon/>
+    </select>
+    <div class="neutral-hover">
+      {#if directoryId}
+        <a href={'/notes/directories'} title="Create Directory">
+          <CreateDirectoryIcon />
         </a>
-      </div>
-    {/if}
+        <a
+          href="/notes/directories/update/{directoryId}"
+          title="Update Directory">
+          <UpdateDirectoryIcon />
+        </a>
+        <button
+          on:click={handleRemove}
+          class="header-control"
+          title="Remove Directory">
+          <RemoveirectoryIcon />
+        </button>
+      {/if}
+
+      {#if directoryId}
+        <a href={'/notes/directories/' + directoryId} title="Create Note">
+          <CreateNoteIcon />
+        </a>
+      {/if}
+    </div>
     {#if !directoryId}
-      <span/>
+      <span />
     {/if}
   </div>
   <ul class="note-list">
     {#if notes}
-      {#each notes as note}
+      {#each notes as note, i (note._id)}
         <li>
-          <a use:active href="/notes/{directoryId}/{note._id}">
+          <a
+            use:active
+            href="/notes/directories/{directoryId}/notes/{note._id}">
             <p class="note-title">{note.title}</p>
             <div class="note-description">
               <p>{timeSince(new Date(note.createdAt))}</p>
               <p class="relative">
-                <button value={note._id} on:click={onNoteRemove}>Remove</button>
+                <button
+                  class="note-control"
+                  value={note._id}
+                  on:click={onNoteRemove}>
+                  Remove
+                </button>
               </p>
             </div>
           </a>
