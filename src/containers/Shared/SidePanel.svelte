@@ -42,13 +42,13 @@
     e.preventDefault();
     e.stopPropagation();
     console.log("eee ", e.target.value);
-    // if (window.confirm("Remove note?")) {
-    const res = await removeNote({ noteId: e.target.value });
-    notes = notes.filter((n) => n._id !== e.target.value);
-    if (e.target.value === params.noteId) {
-      router.goto("/notes/directories/" + directoryId);
+    if (window.confirm("Remove note?")) {
+      const res = await removeNote({ noteId: e.target.value });
+      notes = notes.filter((n) => n._id !== e.target.value);
+      if (e.target.value === params.noteId) {
+        router.goto("/notes/directories/" + directoryId);
+      }
     }
-    // }
   };
   const onDirectoryChange = (e) => {
     router.goto(
