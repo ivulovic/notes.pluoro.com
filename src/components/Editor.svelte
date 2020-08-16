@@ -1,17 +1,22 @@
 <script>
   import { quill } from "svelte-quill";
-  import { onMount, createEventDispatcher, afterUpdate, onDestroy } from "svelte";
+  import {
+    onMount,
+    createEventDispatcher,
+    afterUpdate,
+    onDestroy,
+  } from "svelte";
   const dispatch = createEventDispatcher();
   export let intialEditorContent;
 
-  $: if(intialEditorContent.html){
+  $: if (intialEditorContent.html) {
     initiateEditor();
   }
 
-  function initiateEditor(){
+  function initiateEditor() {
     const qlEditorContentRef = document.querySelector(".ql-editor");
-    if(qlEditorContentRef){
-      qlEditorContentRef.innerHTML= intialEditorContent.html;
+    if (qlEditorContentRef) {
+      qlEditorContentRef.innerHTML = intialEditorContent.html;
     }
   }
 
@@ -23,11 +28,8 @@
         [{ font: [] }],
         [{ color: [] }],
         [{ background: [] }],
+        [{ align: [] }],
         [
-          { align: "" },
-          { align: "center" },
-          { align: "right" },
-          { align: "justify" },
           { list: "ordered" },
           { list: "bullet" },
           { indent: "+1" },
@@ -47,9 +49,12 @@
     min-height: 250px;
     border-color: transparent !important;
   }
+  :global(.ql-editor) {
+    min-height: 250px;
+  }
   :global(.ql-container.ql-snow) {
-    border:none!important;
-    outline: none!important;
+    border: none !important;
+    outline: none !important;
     font-size: unset;
   }
 
@@ -58,7 +63,7 @@
     border-color: transparent;
     color: var(--neutral) !important;
   }
-  :global(.ql-toolbar){
+  :global(.ql-toolbar) {
     background: var(--sidebar-after-background);
   }
   :global(.ql-container) {
@@ -67,5 +72,5 @@
 </style>
 
 <main>
-  <div class="editor" use:quill={options} on:text-change></div>
+  <div class="editor" on:keydown use:quill={options} on:text-change />
 </main>

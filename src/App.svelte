@@ -132,7 +132,7 @@
     display: grid;
     margin-left: 70px;
     position: relative;
-    grid-template-columns: 20% 80%;
+    grid-template-columns: 280px auto;
     padding: 0px 0px 0px 0px;
   }
 </style>

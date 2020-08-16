@@ -41,6 +41,13 @@
       dispatch("create", res);
     }
   };
+
+  function detectControlS(event) {
+    if (event.ctrlKey && event.key.toLowerCase() === "s") {
+      onSubmit();
+      event.preventDefault();
+    }
+  }
 </script>
 
 <style>
@@ -68,7 +75,7 @@
     padding: 28px 20px;
     font-size: 1rem;
     box-sizing: border-box;
-    padding-top: 25px 0px 15px 0px;
+    padding: 25px 20px 11px 20px;
   }
   .controls {
     padding: 0px 15px;
@@ -77,10 +84,15 @@
 
 <div>
   <input
+    on:keydown={detectControlS}
     bind:value={noteTitle}
     class="note-title"
     placeholder="Note title..." />
-  <Editor on:text-change={handleTextChange} {intialEditorContent} />
+  <Editor
+    on:save={onSubmit}
+    on:keydown={detectControlS}
+    on:text-change={handleTextChange}
+    {intialEditorContent} />
   <div class="controls">
     <button on:click={onSubmit}>
       {params.noteId ? 'Update' : 'Create'} Note

@@ -73,9 +73,11 @@
   .header {
     display: flex;
     align-items: center;
+    flex-direction: column;
     padding: 10px;
     justify-content: space-between;
   }
+
   .header select {
     border: none;
     background: transparent;
@@ -85,6 +87,7 @@
     font-size: 16px;
     letter-spacing: 0.03rem;
     padding: 15px 5px 15px 0px;
+    width: 100%;
   }
   .header select option {
     padding: 10px;
@@ -152,6 +155,15 @@
   .note-control {
     z-index: 9;
   }
+
+  .header-controls {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    top: 3px;
+  }
 </style>
 
 <main>
@@ -162,7 +174,7 @@
         <option value={directory._id}>{directory.name}</option>
       {/each}
     </select>
-    <div class="neutral-hover">
+    <div class="neutral-hover header-controls">
       {#if directoryId}
         <a href={'/notes/directories'} title="Create Directory">
           <CreateDirectoryIcon />
